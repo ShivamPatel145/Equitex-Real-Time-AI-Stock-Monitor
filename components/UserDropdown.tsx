@@ -5,10 +5,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { LogOut } from "lucide-react";
@@ -26,7 +25,7 @@ const UserDropdown = () => {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="flex item-center gap-3 text-gray-400 hover:text-yellow-500"
+          className="flex items-center gap-3 text-gray-300 hover:bg-transparent hover:text-gray-300 focus-visible:ring-0 focus-visible:border-transparent aria-expanded:bg-transparent aria-expanded:text-gray-300"
         >
           <Avatar className="h-8 w-8">
             {/* <AvatarImage src="/assets/images/avatar.jpg" alt={user.name} /> */}
@@ -41,32 +40,35 @@ const UserDropdown = () => {
           </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="text-gray-400">
-        <DropdownMenuLabel>
-          <div className="flex relative items-center gap-3 p-2">
-            <Avatar className="h-10 w-10">
-              {/* <AvatarImage src="/assets/images/avatar.jpg" alt={user.name} /> */}
-              <AvatarFallback className="bg-yellow-500 text-yellow-900 text-sm font-bold">
+      <DropdownMenuContent
+        align="end"
+        className="text-gray-300 bg-[#0a0a0a] border border-gray-700/50 shadow-2xl z-[100] w-64 rounded-xl overflow-hidden mt-2 p-1"
+      >
+        <DropdownMenuLabel className="pb-3 border-b border-gray-800/50 mb-1">
+          <div className="flex relative items-center gap-3 px-2 py-1">
+            <Avatar className="h-10 w-10 border border-gray-700/50">
+              <AvatarFallback className="bg-yellow-500/10 text-yellow-500 text-sm font-bold">
                 {user.name[0]}
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
-              <span className="text-base font-medium text-gray-400">
+              <span className="text-base font-semibold text-gray-200">
                 {user.name}
               </span>
-              <span className="text-sm text-gray-500">{user.email}</span>
+              <span className="text-xs text-gray-500">{user.email}</span>
             </div>
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator className="bg-gray-600" />
-        <DropdownMenuItem onClick={handleSignOut} className="text-gray-100 text-md font-medium focus:bg-transparent focus:text-yellow-500 transition-colors cursor-pointer">
-          <LogOut className="h-4 w-4 mr-2 hidden sm:block"/>
+        <DropdownMenuItem
+          onClick={handleSignOut}
+          className="text-gray-300 py-2.5 px-3 rounded-lg text-sm font-medium focus:bg-gray-800/50 focus:text-yellow-500 transition-colors cursor-pointer outline-none flex items-center mt-1"
+        >
+          <LogOut className="h-4 w-4 mr-2" />
           Logout
         </DropdownMenuItem>
-        <DropdownMenuSeparator className="hidden sm:block bg-gray-600" />
-        <nav className="sm:hidden">
-            <NavItems />
-        </nav>
+        <div className="sm:hidden border-t border-gray-800/50 mt-2 mx-1">
+          <NavItems />
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );

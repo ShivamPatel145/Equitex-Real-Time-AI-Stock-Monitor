@@ -246,9 +246,9 @@
     @apply text-white cursor-pointer px-3 py-2 rounded-sm bg-gray-800;
   }
 
-  .country-select-item:hover {
+  /* .country-select-item:hover {
     @apply !bg-gray-600;
-  }
+  } */
 
   .footer-link {
     @apply text-gray-400 font-medium transition-colors;

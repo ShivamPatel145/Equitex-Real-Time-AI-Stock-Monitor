@@ -1,7 +1,7 @@
 export const NAV_ITEMS = [
   { href: "/", label: "Dashboard" },
   { href: "/search", label: "Search" },
-  { href: '/watchlist', label: 'Watchlist' },
+  { href: "/watchlist", label: "Watchlist" },
 ];
 
 // Sign-up form select options
@@ -115,15 +115,59 @@ export const HEATMAP_WIDGET_CONFIG = {
   height: "600",
 };
 
-export const TOP_STORIES_WIDGET_CONFIG = {
+export const HOTLISTS_WIDGET_CONFIG = {
+  colorTheme: "dark",
+  dateRange: "12M",
+  exchange: "BSE",
+  showAndHideCards: true,
+  noTimeScale: false,
+  isTransparent: true,
   displayMode: "regular",
-  feedMode: "symbol",
-  symbol: "BSE:SENSEX",
+  width: "100%",
+  height: "600",
+  locale: "en",
+};
+
+export const TICKER_TAPE_WIDGET_CONFIG = {
+  symbols: [
+    {
+      proName: "BSE:SENSEX",
+      title: "BSE SENSEX",
+    },
+    {
+      proName: "NSE:NIFTY",
+      title: "NIFTY 50",
+    },
+    {
+      description: "Reliance",
+      proName: "BSE:RELIANCE",
+    },
+    {
+      description: "HDFC Bank",
+      proName: "BSE:HDFCBANK",
+    },
+    {
+      description: "TCS",
+      proName: "BSE:TCS",
+    },
+  ],
+  showSymbolLogo: true,
+  isTransparent: true,
+  displayMode: "adaptive",
+  colorTheme: "dark",
+  locale: "en",
+};
+
+export const SCREENER_WIDGET_CONFIG = {
+  width: "100%",
+  height: "700",
+  defaultColumn: "overview",
+  defaultScreen: "general",
+  market: "india",
+  showToolbar: true,
   colorTheme: "dark",
   isTransparent: true,
   locale: "en",
-  width: "100%",
-  height: "600",
 };
 
 export const MARKET_DATA_WIDGET_CONFIG = {
@@ -264,65 +308,65 @@ export const COMPANY_FINANCIALS_WIDGET_CONFIG = (symbol: string) => ({
 });
 
 export const POPULAR_STOCK_SYMBOLS = [
-  // Tech Giants (the big technology companies)
-  "AAPL",
-  "MSFT",
-  "GOOGL",
-  "AMZN",
-  "TSLA",
-  "META",
-  "NVDA",
-  "NFLX",
-  "ORCL",
-  "CRM",
+  // Top Market Cap Companies
+  "RELIANCE",
+  "TCS",
+  "HDFCBANK",
+  "ICICIBANK",
+  "BHARTIARTL",
+  "SBIN",
+  "INFY",
+  "LICI",
+  "ITC",
+  "HINDUNILVR",
 
-  // Growing Tech Companies
-  "ADBE",
-  "INTC",
-  "AMD",
-  "PYPL",
-  "UBER",
-  "ZOOM",
-  "SPOT",
-  "SQ",
-  "SHOP",
-  "ROKU",
+  // Finance & Banking
+  "KOTAKBANK",
+  "AXISBANK",
+  "BAJFINANCE",
+  "BAJAJFINSV",
+  "CHOLAFIN",
+  "PNB",
+  "INDUSINDBK",
+  "BOB",
+  "BANKBARODA",
+  "CANBK",
 
-  // Newer Tech Companies
-  "SNOW",
-  "PLTR",
-  "COIN",
-  "RBLX",
-  "DDOG",
-  "CRWD",
-  "NET",
-  "OKTA",
-  "TWLO",
-  "ZM",
+  // IT & Tech
+  "HCLTECH",
+  "WIPRO",
+  "TECHM",
+  "LTIM",
+  "PERSISTENT",
+  "MPHASIS",
+  "COFORGE",
+  "TATAELXSI",
+  "KPITTECH",
+  "CYIENT",
 
-  // Consumer & Delivery Apps
-  "DOCU",
-  "PTON",
-  "PINS",
-  "SNAP",
-  "LYFT",
-  "DASH",
-  "ABNB",
-  "RIVN",
-  "LCID",
-  "NIO",
+  // Auto & Manufacturing
+  "TATAMOTORS",
+  "M&M",
+  "MARUTI",
+  "BAJAJ-AUTO",
+  "HEROMOTOCO",
+  "EICHERMOT",
+  "TVSMOTOR",
+  "ASHOKLEY",
+  "BOSCHLTD",
+  "MRF",
 
-  // International Companies
-  "XPEV",
-  "LI",
-  "BABA",
-  "JD",
-  "PDD",
-  "TME",
-  "BILI",
-  "DIDI",
-  "GRAB",
-  "SE",
+  // Energy, Infra & Others
+  "LT",
+  "NTPC",
+  "POWERGRID",
+  "ONGC",
+  "COALINDIA",
+  "ADANIENT",
+  "ADANIPORTS",
+  "SUNPHARMA",
+  "CIPLA",
+  "TATASTEEL",
 ];
 
 export const NO_MARKET_NEWS =
