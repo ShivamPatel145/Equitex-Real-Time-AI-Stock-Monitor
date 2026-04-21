@@ -12,14 +12,45 @@ import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { LogOut } from "lucide-react";
 import NavItems from "./NavItems";
+import { signOut } from "@/lib/actions/auth.actions";
+import { toast } from "sonner";
+import { useState } from "react";
 
-const UserDropdown = () => {
+type UserDropdownProps = {
+  user: User;
+};
+
+const UserDropdown = ({ user }: UserDropdownProps) => {
   const router = useRouter();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
   const handleSignOut = async () => {
-    router.push("/sign-in");
+    try {
+      setIsSigningOut(true);
+
+      const result = await signOut();
+
+      if (!result.success) {
+        toast.error("Sign out failed", {
+          description: result.error ?? "Could not sign out. Please try again.",
+        });
+        return;
+      }
+
+      toast.success("Signed out");
+      router.push("/sign-in");
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+      toast.error("Sign out failed", {
+        description:
+          error instanceof Error ? error.message : "Could not sign out.",
+      });
+    } finally {
+      setIsSigningOut(false);
+    }
   };
 
-  const user = { name: "John Doe", email: "contact@jondoe.com" };
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -60,11 +91,12 @@ const UserDropdown = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuItem
+          disabled={isSigningOut}
           onClick={handleSignOut}
-          className="text-gray-300 py-2.5 px-3 rounded-lg text-sm font-medium focus:bg-gray-800/50 focus:text-yellow-500 transition-colors cursor-pointer outline-none flex items-center mt-1"
+          className="text-gray-300 py-2.5 px-3 rounded-lg text-sm font-medium focus:bg-gray-800/50 focus:text-yellow-500 transition-colors cursor-pointer outline-none flex items-center mt-1 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <LogOut className="h-4 w-4 mr-2" />
-          Logout
+          {isSigningOut ? "Logging out..." : "Logout"}
         </DropdownMenuItem>
         <div className="sm:hidden border-t border-gray-800/50 mt-2 mx-1">
           <NavItems />

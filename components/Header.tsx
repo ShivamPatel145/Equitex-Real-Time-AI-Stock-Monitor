@@ -3,7 +3,11 @@ import Link from "next/link";
 import NavItems from "@/components/NavItems";
 import UserDropdown from "@/components/UserDropdown";
 
-const Header = () => {
+type HeaderProps = {
+  user: User;
+};
+
+const Header = ({ user }: HeaderProps) => {
   return (
     <header className="sticky top-0 z-50 w-full h-[70px] border-b border-gray-700/50 bg-[#050505]/80 backdrop-blur-md shadow-sm">
       <div className="container h-full flex justify-between items-center px-4 md:px-6">
@@ -21,7 +25,7 @@ const Header = () => {
           <NavItems />
         </nav>
         <div className="ml-auto sm:ml-0 flex items-center justify-end">
-          <UserDropdown />
+          <UserDropdown user={user} />
         </div>
       </div>
     </header>
