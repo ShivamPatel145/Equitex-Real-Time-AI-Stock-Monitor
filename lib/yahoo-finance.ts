@@ -1,47 +1,64 @@
-import yahooFinance from "yahoo-finance2";
+import YahooFinance from "yahoo-finance2";
 import { DASHBOARD_STOCKS, DashboardStock } from "./constants";
 
+const yahooFinance = new YahooFinance();
+
 const getYahooSymbol = (symbol: string, exchange: "BSE" | "NSE") => {
-  return exchange === "BSE" ? `${symbol}.BO` : `${symbol}.NS`;
+  if (symbol === "M&M") return "M&M.NS";
+  // Yahoo Finance NSE (.NS) symbols are generally more reliable for Indian stocks
+  return `${symbol}.NS`;
 };
 
-export const fetchLiveStockData = async (): Promise<DashboardStock[]> => {
-  const symbols = DASHBOARD_STOCKS.map((stock) =>
+export const fetchLiveStockData = async (customSymbols?: string[]): Promise<DashboardStock[]> => {
+  const symbolsToFetch = customSymbols || DASHBOARD_STOCKS.map((stock) =>
     getYahooSymbol(stock.symbol, stock.exchange),
   );
 
   try {
-    const quotes = await yahooFinance.quote(symbols);
+    const quoteResults = await Promise.all(
+      symbolsToFetch.map((symbol) =>
+        yahooFinance.quote(symbol).catch((err) => {
+          console.warn(`Failed to fetch live data for ${symbol}: `, err.message);
+          return null;
+        }),
+      ),
+    );
+
+    const validQuotes = quoteResults.filter((q) => q != null);
     
-    // Map quotes back to DASHBOARD_STOCKS format
-    const quoteMap = new Map(quotes.map(q => [q.symbol, q]));
+    // Map quotes to DashboardStock format
+    return validQuotes.map((q) => {
+      // Find matching mock stock if it exists to preserve sector/company fallback
+      const mockStock = DASHBOARD_STOCKS.find(
+        (s) => getYahooSymbol(s.symbol, s.exchange) === q!.symbol
+      );
 
-    return DASHBOARD_STOCKS.map((stock) => {
-      const yahooSymbol = getYahooSymbol(stock.symbol, stock.exchange);
-      const liveData = quoteMap.get(yahooSymbol);
-
-      if (!liveData) return stock; // Fallback to mock data if not found
-
-      const price = liveData.regularMarketPrice ?? stock.price;
-      const previousClose = liveData.regularMarketPreviousClose ?? stock.price;
-      const changePercent = liveData.regularMarketChangePercent ?? stock.changePercent;
+      const price = q!.regularMarketPrice ?? 0;
+      const previousClose = q!.regularMarketPreviousClose ?? price;
+      const changePercent = price && previousClose ? ((price - previousClose) / previousClose) * 100 : 0;
       
-      const marketCapValue = liveData.marketCap ? liveData.marketCap / 1e12 : stock.marketCapValue;
-      const marketCapLabel = liveData.marketCap 
+      const marketCapValue = q!.marketCap ? q!.marketCap / 1e12 : (mockStock?.marketCapValue ?? 0);
+      const marketCapLabel = q!.marketCap 
         ? `INR ${marketCapValue.toFixed(2)}T` 
-        : stock.marketCapLabel;
+        : (mockStock?.marketCapLabel ?? "N/A");
 
       return {
-        ...stock,
+        symbol: q!.symbol,
+        company: q!.longName || q!.shortName || mockStock?.company || q!.symbol,
+        exchange: (q!.exchange === "BSE" ? "BSE" : "NSE") as "BSE" | "NSE",
+        tradingViewSymbol: q!.exchange === "BSE" ? `BSE:${q!.symbol.replace('.BO', '')}` : `NSE:${q!.symbol.replace('.NS', '')}`,
+        sector: mockStock?.sector || "All",
         price,
         changePercent,
         marketCapValue,
         marketCapLabel,
-        peRatio: liveData.trailingPE ?? stock.peRatio,
+        peRatio: q!.trailingPE ?? (mockStock?.peRatio ?? 0),
       };
     });
   } catch (error) {
     console.error("Error fetching live stock data:", error);
-    return DASHBOARD_STOCKS; // Fallback on error
+    // If we used custom symbols and failed, return empty array to avoid showing random data
+    if (customSymbols) return [];
+    return DASHBOARD_STOCKS; // Fallback to mock data for default dashboard
   }
 };

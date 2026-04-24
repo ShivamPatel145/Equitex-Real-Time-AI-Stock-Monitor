@@ -25,7 +25,14 @@ const WatchlistPage = () => {
   const { watchlistSymbols, removeWatchlistSymbol, clearWatchlist } = useWatchlist();
 
   useEffect(() => {
-    fetch("/api/stocks")
+    if (!watchlistSymbols.length) {
+      setDashboardStocks([]);
+      return;
+    }
+
+    const endpoint = `/api/stocks?symbols=${encodeURIComponent(watchlistSymbols.join(","))}`;
+    
+    fetch(endpoint)
       .then((res) => res.json())
       .then((data) => {
         if (data.success && data.data) {
@@ -33,7 +40,7 @@ const WatchlistPage = () => {
         }
       })
       .catch((err) => console.error("Error fetching live stocks:", err));
-  }, []);
+  }, [watchlistSymbols]);
 
 
   const watchlistStocks = useMemo(() => {
@@ -224,8 +231,12 @@ const WatchlistPage = () => {
                     const positive = stock.changePercent >= 0;
 
                     return (
-                      <tr key={stock.symbol} className="text-sm text-gray-300 hover:bg-gray-800/40">
-                        <td className="px-4 py-3 font-semibold text-gray-100">{stock.symbol}</td>
+                      <tr key={stock.symbol} className="text-sm text-gray-300 hover:bg-gray-800/40 transition-colors">
+                        <td className="px-4 py-3 font-semibold text-gray-100">
+                          <Link href={`/stock/${encodeURIComponent(stock.symbol)}`} className="hover:text-teal-400 transition-colors">
+                            {stock.symbol}
+                          </Link>
+                        </td>
                         <td className="px-4 py-3">{stock.company}</td>
                         <td className="px-4 py-3">{formatINRCurrency(stock.price)}</td>
                         <td

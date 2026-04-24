@@ -88,7 +88,9 @@ const Home = async () => {
             </div>
             <div className="rounded-xl border border-gray-700/60 bg-gray-800/60 p-4">
               <p className="text-xs uppercase tracking-[0.18em] text-gray-500">Top Gainer</p>
-              <p className="mt-1 text-2xl font-semibold text-gray-100">{topGainer.symbol}</p>
+              <Link href={`/stock/${encodeURIComponent(topGainer.symbol)}`} className="mt-1 block text-2xl font-semibold text-gray-100 hover:text-teal-400 transition-colors">
+                {topGainer.symbol}
+              </Link>
               <p className="mt-1 text-xs text-teal-400">+{topGainer.changePercent.toFixed(2)}%</p>
             </div>
             <div className="rounded-xl border border-gray-700/60 bg-gray-800/60 p-4">

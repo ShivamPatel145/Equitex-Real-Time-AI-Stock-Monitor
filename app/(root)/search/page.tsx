@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { SearchIcon, SlidersHorizontal, Star, StarOff } from "lucide-react";
+import { useEffect, useMemo, useState, useCallback } from "react";
+import { SearchIcon, SlidersHorizontal, Star, StarOff, X, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -59,20 +59,44 @@ const getInitialFilters = (): SearchFilters => {
 const SearchPage = () => {
   const [filters, setFilters] = useState<SearchFilters>(getInitialFilters);
   const [dashboardStocks, setDashboardStocks] = useState<DashboardStock[]>(DASHBOARD_STOCKS);
+  const [isSearching, setIsSearching] = useState(false);
   const { watchlistSymbols, watchlistSet, toggleWatchlistSymbol } = useWatchlist();
 
   const { query, sector, sortMode, watchlistOnly } = filters;
 
+  // Debounce logic for the dynamic search
+  const [debouncedQuery, setDebouncedQuery] = useState(query);
+
   useEffect(() => {
-    fetch("/api/stocks")
-      .then((res) => res.json())
-      .then((data) => {
+    const timer = setTimeout(() => setDebouncedQuery(query), 500);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  // Fetch stocks based on the debounced query
+  useEffect(() => {
+    const fetchStocks = async () => {
+      setIsSearching(true);
+      try {
+        let endpoint = "/api/stocks"; // Default market overview
+        if (debouncedQuery.trim()) {
+          endpoint = `/api/search?q=${encodeURIComponent(debouncedQuery.trim())}`;
+        }
+        
+        const res = await fetch(endpoint);
+        const data = await res.json();
+        
         if (data.success && data.data) {
           setDashboardStocks(data.data);
         }
-      })
-      .catch((err) => console.error("Error fetching live stocks:", err));
-  }, []);
+      } catch (err) {
+        console.error("Error fetching live stocks:", err);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    fetchStocks();
+  }, [debouncedQuery]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -130,14 +154,17 @@ const SearchPage = () => {
     const normalizedQuery = query.trim().toLowerCase();
 
     const matchingStocks = dashboardStocks.filter((stock) => {
-      const sectorMatched = sector === "All" || stock.sector === sector;
+      const sectorMatched = sector === "All" || stock.sector === sector || !stock.sector;
       const watchlistMatched = !watchlistOnly || watchlistSet.has(stock.symbol);
-      const queryMatched =
-        !normalizedQuery ||
+      
+      // Dynamic search handles query matching on the backend for non-watchlist stocks.
+      // But if we are in watchlist-only mode, we might need to filter client-side.
+      const queryMatched = 
+        !normalizedQuery || 
         stock.symbol.toLowerCase().includes(normalizedQuery) ||
         stock.company.toLowerCase().includes(normalizedQuery);
 
-      return sectorMatched && queryMatched && watchlistMatched;
+      return sectorMatched && watchlistMatched && queryMatched;
     });
 
     if (sortMode === "gainers") {
@@ -161,7 +188,7 @@ const SearchPage = () => {
       const bStartsWith = b.symbol.toLowerCase().startsWith(normalizedQuery) ? 1 : 0;
       return bStartsWith - aStartsWith;
     });
-  }, [query, sector, sortMode, watchlistOnly, watchlistSet]);
+  }, [query, sector, sortMode, watchlistOnly, watchlistSet, dashboardStocks]);
 
   const averageMove = useMemo(() => {
     if (!filteredStocks.length) return 0;
@@ -223,13 +250,25 @@ const SearchPage = () => {
         <div className="grid gap-4 lg:grid-cols-[1.4fr_0.8fr_0.8fr]">
           <label className="relative block">
             <span className="sr-only">Search stocks</span>
-            <SearchIcon className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-500" />
-            <Input
-              value={query}
-              onChange={(event) => updateFilters({ query: event.target.value })}
-              placeholder="Search by symbol or company"
-              className="h-11 border-gray-700/70 bg-gray-800/70 pl-10 text-gray-100 placeholder:text-gray-500"
-            />
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Search companies, symbols, or indices..."
+                value={query}
+                onChange={(e) => updateFilters({ query: e.target.value })}
+                className="h-12 w-full rounded-full border-gray-700 bg-gray-800/80 pl-12 pr-4 text-gray-100 placeholder:text-gray-500 focus-visible:ring-1 focus-visible:ring-teal-500"
+              />
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => updateFilters({ query: "" })}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-1 text-gray-400 hover:bg-gray-700 hover:text-gray-200"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
           </label>
 
           <Select
@@ -290,7 +329,22 @@ const SearchPage = () => {
         </div>
       </section>
 
-      {filteredStocks.length ? (
+      {isSearching ? (
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-64 rounded-2xl border border-gray-700/50 bg-[#0a0a0a] p-5 shadow-xl animate-pulse">
+              <div className="h-4 w-12 bg-gray-800 rounded mb-4"></div>
+              <div className="h-6 w-3/4 bg-gray-800 rounded mb-2"></div>
+              <div className="h-4 w-1/2 bg-gray-800 rounded mb-8"></div>
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="h-16 bg-gray-800 rounded-xl"></div>
+                <div className="h-16 bg-gray-800 rounded-xl"></div>
+              </div>
+              <div className="h-10 bg-gray-800 rounded-lg w-full"></div>
+            </div>
+          ))}
+        </section>
+      ) : filteredStocks.length ? (
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filteredStocks.map((stock) => {
             const isInWatchlist = watchlistSet.has(stock.symbol);
@@ -299,60 +353,63 @@ const SearchPage = () => {
             return (
               <article
                 key={stock.symbol}
-                className="rounded-2xl border border-gray-700/50 bg-[#0a0a0a] p-5 shadow-xl transition-colors hover:border-teal-500/40"
+                className="group rounded-2xl border border-gray-700/50 bg-[#0a0a0a] shadow-xl transition-all hover:border-teal-500/40 hover:-translate-y-1 relative"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">
-                      {stock.exchange}
-                    </p>
-                    <h2 className="mt-1 text-xl font-semibold text-gray-100">{stock.symbol}</h2>
-                    <p className="mt-1 text-sm text-gray-400">{stock.company}</p>
+                <Link href={`/stock/${encodeURIComponent(stock.symbol)}`} className="absolute inset-0 z-0" />
+                <div className="p-5 relative z-10 flex flex-col h-full pointer-events-none">
+                  <div className="flex items-start justify-between gap-3 pointer-events-auto">
+                    <Link href={`/stock/${encodeURIComponent(stock.symbol)}`} className="flex-1">
+                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">
+                        {stock.exchange}
+                      </p>
+                      <h2 className="mt-1 text-xl font-semibold text-gray-100 group-hover:text-teal-400 transition-colors">{stock.symbol}</h2>
+                      <p className="mt-1 text-sm text-gray-400 line-clamp-1">{stock.company}</p>
+                    </Link>
+
+                    <span className="rounded-full border border-gray-700/70 bg-gray-800 px-2.5 py-1 text-xs text-gray-300">
+                      {stock.sector}
+                    </span>
                   </div>
 
-                  <span className="rounded-full border border-gray-700/70 bg-gray-800 px-2.5 py-1 text-xs text-gray-300">
-                    {stock.sector}
-                  </span>
-                </div>
-
-                <div className="mt-4 grid grid-cols-2 gap-3">
-                  <div className="rounded-xl bg-gray-800/70 p-3">
-                    <p className="text-xs uppercase tracking-[0.16em] text-gray-500">Price</p>
-                    <p className="mt-1 text-lg font-semibold text-gray-100">
-                      {formatINRCurrency(stock.price)}
-                    </p>
+                  <div className="mt-4 grid grid-cols-2 gap-3 pointer-events-none">
+                    <div className="rounded-xl bg-gray-800/70 p-3">
+                      <p className="text-xs uppercase tracking-[0.16em] text-gray-500">Price</p>
+                      <p className="mt-1 text-lg font-semibold text-gray-100">
+                        {formatINRCurrency(stock.price)}
+                      </p>
+                    </div>
+                    <div className="rounded-xl bg-gray-800/70 p-3">
+                      <p className="text-xs uppercase tracking-[0.16em] text-gray-500">Daily Change</p>
+                      <p className={`mt-1 text-lg font-semibold ${changeClass}`}>
+                        {stock.changePercent >= 0 ? "+" : ""}
+                        {stock.changePercent.toFixed(2)}%
+                      </p>
+                    </div>
                   </div>
-                  <div className="rounded-xl bg-gray-800/70 p-3">
-                    <p className="text-xs uppercase tracking-[0.16em] text-gray-500">Daily Change</p>
-                    <p className={`mt-1 text-lg font-semibold ${changeClass}`}>
-                      {stock.changePercent >= 0 ? "+" : ""}
-                      {stock.changePercent.toFixed(2)}%
-                    </p>
+
+                  <div className="mt-4 flex items-center justify-between text-sm text-gray-400 pointer-events-none">
+                    <span>Market Cap {stock.marketCapLabel}</span>
+                    <span>P/E {stock.peRatio}</span>
                   </div>
-                </div>
 
-                <div className="mt-4 flex items-center justify-between text-sm text-gray-400">
-                  <span>Market Cap {stock.marketCapLabel}</span>
-                  <span>P/E {stock.peRatio}</span>
+                  <Button
+                    type="button"
+                    onClick={() => toggleWatchlistSymbol(stock.symbol)}
+                    variant={isInWatchlist ? "secondary" : "outline"}
+                    className={`mt-4 h-10 w-full cursor-pointer pointer-events-auto border-gray-700 text-sm font-medium ${
+                      isInWatchlist
+                        ? "bg-teal-500/10 text-teal-300 hover:bg-teal-500/20"
+                        : "bg-gray-800 text-gray-200 hover:bg-gray-700"
+                    }`}
+                  >
+                    {isInWatchlist ? (
+                      <StarOff className="mr-2 h-4 w-4" />
+                    ) : (
+                      <Star className="mr-2 h-4 w-4" />
+                    )}
+                    {isInWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
+                  </Button>
                 </div>
-
-                <Button
-                  type="button"
-                  onClick={() => toggleWatchlistSymbol(stock.symbol)}
-                  variant={isInWatchlist ? "secondary" : "outline"}
-                  className={`mt-4 h-10 w-full cursor-pointer border-gray-700 text-sm font-medium ${
-                    isInWatchlist
-                      ? "bg-teal-500/10 text-teal-300 hover:bg-teal-500/20"
-                      : "bg-gray-800 text-gray-200 hover:bg-gray-700"
-                  }`}
-                >
-                  {isInWatchlist ? (
-                    <StarOff className="mr-2 h-4 w-4" />
-                  ) : (
-                    <Star className="mr-2 h-4 w-4" />
-                  )}
-                  {isInWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
-                </Button>
               </article>
             );
           })}
