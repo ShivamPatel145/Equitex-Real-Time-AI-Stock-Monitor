@@ -408,20 +408,24 @@ export const TICKER_TAPE_WIDGET_CONFIG = {
       title: "BSE SENSEX",
     },
     {
-      proName: "NSE:NIFTY",
-      title: "NIFTY 50",
+      proName: "FOREXCOM:SPXUSD",
+      title: "S&P 500",
     },
     {
-      description: "Reliance",
-      proName: "BSE:RELIANCE",
+      proName: "FOREXCOM:NSXUSD",
+      title: "US 100",
     },
     {
-      description: "HDFC Bank",
-      proName: "BSE:HDFCBANK",
+      proName: "FX_IDC:INRUSD",
+      title: "INR/USD",
     },
     {
-      description: "TCS",
-      proName: "BSE:TCS",
+      proName: "TVC:GOLD",
+      title: "Gold",
+    },
+    {
+      proName: "TVC:USOIL",
+      title: "Crude Oil",
     },
   ],
   showSymbolLogo: true,
@@ -429,6 +433,26 @@ export const TICKER_TAPE_WIDGET_CONFIG = {
   displayMode: "adaptive",
   colorTheme: "dark",
   locale: "en",
+};
+
+export const TIMELINE_WIDGET_CONFIG = {
+  feedMode: "all_symbols",
+  isTransparent: true,
+  displayMode: "regular",
+  width: "100%",
+  height: 550,
+  colorTheme: "dark",
+  locale: "en",
+};
+
+export const EVENTS_WIDGET_CONFIG = {
+  colorTheme: "dark",
+  isTransparent: true,
+  width: "100%",
+  height: 550,
+  locale: "en",
+  importanceFilter: "-1,0,1",
+  currencyFilter: "INR,USD",
 };
 
 export const SCREENER_WIDGET_CONFIG = {

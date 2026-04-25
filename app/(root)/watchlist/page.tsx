@@ -96,10 +96,14 @@ const WatchlistPage = () => {
 
   const tickerTapeConfig = useMemo(
     () => ({
-      symbols: displayedWatchlistStocks.slice(0, 12).map((stock) => ({
-        proName: stock.tradingViewSymbol,
-        title: stock.symbol,
-      })),
+      symbols: displayedWatchlistStocks.map((stock) => {
+        const cleanSymbol = stock.symbol.replace('.NS', '').replace('.BO', '');
+        const proName = `BSE:${cleanSymbol}`;
+        return {
+          proName,
+          title: cleanSymbol,
+        };
+      }),
       showSymbolLogo: true,
       isTransparent: true,
       displayMode: "adaptive",
@@ -147,21 +151,21 @@ const WatchlistPage = () => {
                 {averageMove.toFixed(2)}%
               </p>
             </div>
-            <div className="rounded-xl border border-gray-700/60 bg-gray-800/60 p-4">
-              <p className="text-xs uppercase tracking-[0.18em] text-gray-500">Top Gainer</p>
-              <p className="mt-1 text-xl font-semibold text-teal-400">
-                {bestPerformer ? `${bestPerformer.symbol}` : "-"}
+            <div className="rounded-xl border border-gray-700/60 bg-gray-800/60 p-4 min-w-0">
+              <p className="text-xs uppercase tracking-[0.18em] text-gray-500 truncate">Top Gainer</p>
+              <p className="mt-1 text-xl font-semibold text-teal-400 truncate">
+                {bestPerformer ? `${bestPerformer.symbol.replace('.NS', '').replace('.BO', '')}` : "-"}
               </p>
-              <p className="mt-1 text-xs text-teal-400">
+              <p className="mt-1 text-xs text-teal-400 truncate">
                 {bestPerformer ? `+${bestPerformer.changePercent.toFixed(2)}%` : "--"}
               </p>
             </div>
-            <div className="rounded-xl border border-gray-700/60 bg-gray-800/60 p-4">
-              <p className="text-xs uppercase tracking-[0.18em] text-gray-500">Top Loser</p>
-              <p className="mt-1 text-xl font-semibold text-red-400">
-                {worstPerformer ? `${worstPerformer.symbol}` : "-"}
+            <div className="rounded-xl border border-gray-700/60 bg-gray-800/60 p-4 min-w-0">
+              <p className="text-xs uppercase tracking-[0.18em] text-gray-500 truncate">Top Loser</p>
+              <p className="mt-1 text-xl font-semibold text-red-400 truncate">
+                {worstPerformer ? `${worstPerformer.symbol.replace('.NS', '').replace('.BO', '')}` : "-"}
               </p>
-              <p className="mt-1 text-xs text-red-400">
+              <p className="mt-1 text-xs text-red-400 truncate">
                 {worstPerformer ? `${worstPerformer.changePercent.toFixed(2)}%` : "--"}
               </p>
             </div>

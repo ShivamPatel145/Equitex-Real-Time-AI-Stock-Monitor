@@ -10,7 +10,12 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
     redirect("/sign-in");
   }
 
-  const session = await auth.api.getSession({ headers: await headers() });
+  let session = null;
+  try {
+    session = await auth.api.getSession({ headers: await headers() });
+  } catch (error) {
+    console.error("Session fetch error:", error);
+  }
 
   if (!session?.user) {
     redirect("/sign-in");

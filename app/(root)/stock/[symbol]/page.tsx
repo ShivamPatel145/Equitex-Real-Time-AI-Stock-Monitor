@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import YahooFinance from "yahoo-finance2";
 import TradingViewWidget from "@/components/TradingViewWidget";
+import TradingViewAdvancedChart from "@/components/TradingViewAdvancedChart";
 import { formatINRCurrency } from "@/lib/utils";
 import { ArrowLeft, TrendingUp, TrendingDown, Activity, DollarSign, Briefcase } from "lucide-react";
 import Link from "next/link";
@@ -88,9 +89,8 @@ export default async function StockDetailPage({ params }: PageProps) {
 
           {/* Chart */}
           <div className="rounded-3xl border border-gray-700/50 bg-[#0a0a0a]/80 p-4 backdrop-blur-xl h-[500px]">
-             <TradingViewWidget 
-                scriptUrl="https://s3.tradingview.com/tv.js"
-                config={chartConfig}
+             <TradingViewAdvancedChart 
+                symbol={tradingViewSymbol}
                 height={460}
              />
           </div>

@@ -52,7 +52,7 @@ export default function AiChatbot() {
       {/* Chat Button */}
       <Button
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 h-14 w-14 rounded-full bg-teal-500 text-gray-950 shadow-xl transition-transform hover:scale-105 hover:bg-teal-400 ${
+        className={`fixed bottom-6 right-6 z-[999] h-14 w-14 rounded-full bg-teal-500 text-gray-950 shadow-xl transition-transform hover:scale-105 hover:bg-teal-400 ${
           isOpen ? "hidden" : "flex"
         }`}
       >
@@ -61,7 +61,7 @@ export default function AiChatbot() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 flex h-[500px] w-[350px] flex-col overflow-hidden rounded-2xl border border-gray-700/50 bg-[#0a0a0a] shadow-2xl">
+        <div className="fixed bottom-6 right-6 z-[1000] flex h-[500px] w-[350px] flex-col overflow-hidden rounded-2xl border border-gray-700/50 bg-[#0a0a0a] shadow-2xl">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-gray-700/50 bg-gray-900/50 p-4">
             <div className="flex items-center gap-2">

@@ -14,7 +14,7 @@ const sanitizeSymbols = (rawSymbols: unknown): string[] => {
   const normalizedSymbols = rawSymbols
     .filter((symbol): symbol is string => typeof symbol === "string")
     .map((symbol) => symbol.trim().toUpperCase())
-    .filter((symbol) => symbol.length > 0 && VALID_SYMBOLS.has(symbol));
+    .filter((symbol) => symbol.length > 0);
 
   return Array.from(new Set(normalizedSymbols));
 };
@@ -50,7 +50,6 @@ export const useWatchlist = () => {
 
   const toggleWatchlistSymbol = useCallback((symbol: string) => {
     const normalizedSymbol = symbol.trim().toUpperCase();
-    if (!VALID_SYMBOLS.has(normalizedSymbol)) return;
 
     setWatchlistSymbols((previousSymbols) => {
       const nextSymbols = previousSymbols.includes(normalizedSymbol)

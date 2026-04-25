@@ -62,3 +62,54 @@ export const fetchLiveStockData = async (customSymbols?: string[]): Promise<Dash
     return DASHBOARD_STOCKS; // Fallback to mock data for default dashboard
   }
 };
+
+export type IndexData = {
+  symbol: string;
+  name: string;
+  price: number;
+  change: number;
+  changePercent: number;
+};
+
+export const fetchMarketIndices = async (): Promise<IndexData[]> => {
+  const indices = [
+    { symbol: "^NSEI", name: "NIFTY 50" },
+    { symbol: "^BSESN", name: "SENSEX" },
+    { symbol: "^NSEBANK", name: "NIFTY BANK" },
+    { symbol: "^CNXIT", name: "NIFTY IT" },
+  ];
+
+  try {
+    const quoteResults = await Promise.all(
+      indices.map((idx) =>
+        yahooFinance.quote(idx.symbol).catch((err) => {
+          console.warn(`Failed to fetch live data for ${idx.symbol}: `, err.message);
+          return null;
+        }),
+      ),
+    );
+
+    return quoteResults.map((q, i) => {
+      if (!q) {
+        return {
+          symbol: indices[i].symbol,
+          name: indices[i].name,
+          price: 0,
+          change: 0,
+          changePercent: 0,
+        };
+      }
+
+      return {
+        symbol: q.symbol,
+        name: indices[i].name,
+        price: q.regularMarketPrice ?? 0,
+        change: q.regularMarketChange ?? 0,
+        changePercent: q.regularMarketChangePercent ?? 0,
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching market indices:", error);
+    return indices.map((idx) => ({ ...idx, price: 0, change: 0, changePercent: 0 }));
+  }
+};
