@@ -20,10 +20,10 @@ export const sendWelcomeEmail = async ({
   );
 
   const mailOptions = {
-    from: `"Signalist" <${process.env.NODEMAILER_EMAIL ?? "signalist@jsmastery.pro"}>`,
+    from: `"Equitex" <${process.env.NODEMAILER_EMAIL ?? "equitex@gmail.com"}>`,
     to: email,
-    subject: "Welcome to Signalist - your stock market toolkit is ready!",
-    text: "Thanks for joining Signalist",
+    subject: "Welcome to Equitex - your stock market toolkit is ready!",
+    text: "Thanks for joining Equitex",
     html: htmlTemplate,
   };
 

@@ -22,11 +22,11 @@ type InferredIntroResponse = {
 };
 
 const DEFAULT_WELCOME_INTRO =
-  "Thanks for joining Signalist. You now have the tools to track markets and make smarter moves.";
+  "Thanks for joining Equitex. You now have the tools to track markets and make smarter moves.";
 
 export const sendSignUpEmail = inngest.createFunction(
   {
-    id: "sign-up-email",
+    id: "equitex-sign-up-email",
     triggers: [{ event: "app/user.created" }],
   },
   async ({ event, step }) => {

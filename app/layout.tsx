@@ -14,9 +14,49 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Equitex - Real-time Stock Market Dashboard",
+  title: {
+    default: "Equitex — Indian Stock Market Terminal",
+    template: "%s | Equitex",
+  },
   description:
-    "Track real-time stock prices, get personalized alerts and explore detailed company insights.",
+    "Professional-grade Indian stock market terminal. Real-time SENSEX, NIFTY 50, sector heatmaps, AI-powered market analysis, and live stock screener — all in one place.",
+  keywords: [
+    "Indian stock market",
+    "NSE BSE live",
+    "NIFTY 50",
+    "SENSEX",
+    "stock screener India",
+    "market dashboard",
+    "equity terminal",
+    "stock analysis",
+  ],
+  authors: [{ name: "Equitex" }],
+  creator: "Equitex",
+  metadataBase: new URL("https://equitex.pro"),
+  openGraph: {
+    type: "website",
+    locale: "en_IN",
+    url: "https://equitex.pro",
+    title: "Equitex — Indian Stock Market Terminal",
+    description:
+      "Professional-grade Indian stock market terminal. Real-time SENSEX, NIFTY 50, sector heatmaps, AI-powered market analysis.",
+    siteName: "Equitex",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Equitex — Indian Stock Market Terminal",
+    description:
+      "Professional-grade Indian stock market terminal. Real-time SENSEX, NIFTY 50, sector heatmaps, AI-powered market analysis.",
+    creator: "@equitexpro",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
 };
 
 export default function RootLayout({

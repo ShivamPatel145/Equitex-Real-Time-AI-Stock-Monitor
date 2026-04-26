@@ -1,4 +1,5 @@
 import YahooFinance from "yahoo-finance2";
+import { unstable_cache } from "next/cache";
 import { DASHBOARD_STOCKS, DashboardStock } from "./constants";
 
 const yahooFinance = new YahooFinance();
@@ -71,7 +72,7 @@ export type IndexData = {
   changePercent: number;
 };
 
-export const fetchMarketIndices = async (): Promise<IndexData[]> => {
+const _fetchMarketIndices = async (): Promise<IndexData[]> => {
   const indices = [
     { symbol: "^NSEI", name: "NIFTY 50" },
     { symbol: "^BSESN", name: "SENSEX" },
@@ -113,3 +114,10 @@ export const fetchMarketIndices = async (): Promise<IndexData[]> => {
     return indices.map((idx) => ({ ...idx, price: 0, change: 0, changePercent: 0 }));
   }
 };
+
+// Cache for 60 seconds to prevent rate limiting in production
+export const fetchMarketIndices = unstable_cache(
+  _fetchMarketIndices,
+  ["market-indices"],
+  { revalidate: 60, tags: ["market-indices"] }
+);

@@ -457,14 +457,34 @@ export const EVENTS_WIDGET_CONFIG = {
 
 export const SCREENER_WIDGET_CONFIG = {
   width: "100%",
-  height: "700",
-  defaultColumn: "overview",
-  defaultScreen: "general",
+  height: "1000",
+  defaultColumn: "performance",
+  defaultScreen: "top_gainers",
   market: "india",
   showToolbar: true,
   colorTheme: "dark",
-  isTransparent: true,
+  isTransparent: false,
   locale: "en",
+};
+
+export const FOREX_CROSS_RATES_CONFIG = {
+  width: "100%",
+  height: 550,
+  currencies: ["INR", "USD", "EUR", "GBP", "JPY", "CHF"],
+  isTransparent: true,
+  colorTheme: "dark",
+  locale: "en",
+};
+
+export const TECHNICAL_ANALYSIS_CONFIG = {
+  interval: "1D",
+  width: "100%",
+  isTransparent: true,
+  height: 550,
+  symbol: "BSE:SENSEX",
+  showIntervalTabs: true,
+  locale: "en",
+  colorTheme: "dark",
 };
 
 export const MARKET_DATA_WIDGET_CONFIG = {
